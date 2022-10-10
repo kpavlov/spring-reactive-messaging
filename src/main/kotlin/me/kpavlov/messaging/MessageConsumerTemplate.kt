@@ -4,7 +4,7 @@ import org.springframework.boot.availability.AvailabilityChangeEvent
 import org.springframework.boot.availability.ReadinessState
 import org.springframework.context.event.EventListener
 
-public abstract class ReactiveConsumerTemplate {
+public abstract class MessageConsumerTemplate {
 
     public abstract fun start()
 

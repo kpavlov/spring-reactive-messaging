@@ -2,8 +2,8 @@ package me.kpavlov.messaging.sqs.consumer
 
 import io.vavr.Tuple
 import io.vavr.Tuple2
+import me.kpavlov.messaging.MessageConsumerTemplate
 import me.kpavlov.messaging.ReactiveAcknowledgmentCallback
-import me.kpavlov.messaging.ReactiveConsumerTemplate
 import me.kpavlov.messaging.ReactiveMessageHandler
 import me.kpavlov.messaging.sqs.SqsConsumerOperations
 import org.slf4j.Logger
@@ -30,7 +30,7 @@ public class SqsMessageConsumer<T> public constructor(
     private val properties: SqsConsumerProperties,
     messageProcessor: ReactiveMessageHandler<T>,
     messageBodyDecoder: Function<String, T>
-) : ReactiveConsumerTemplate() {
+) : MessageConsumerTemplate() {
     private val logger: Logger
     private val queueName: String = properties.queueName
     private val sqsClient: SqsAsyncClient
