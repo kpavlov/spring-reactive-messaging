@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>me.kpavlov.messaging</groupId>
+    <artifactId>spring-reactive-messaging</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <kotlin.version>1.7.20</kotlin.version>
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Dependencies -->
+        <aws-sdk.version>[2.17.285,3.0)</aws-sdk.version>
+        <maya.version>1.2.1</maya.version>
+        <spring-boot.version>2.7.4</spring-boot.version>
+        <vavr.version>0.10.4</vavr.version>
+        <ktlint.version>0.47.1</ktlint.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-bom</artifactId>
+                <version>${kotlin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.vavr</groupId>
+            <artifactId>vavr</artifactId>
+            <version>${vavr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sqs</artifactId>
+            <version>${aws-sdk.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.kpavlov.maya</groupId>
+            <artifactId>maya</artifactId>
+            <version>${maya.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito.kotlin</groupId>
+            <artifactId>mockito-kotlin</artifactId>
+            <version>4.0.0</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+
+    <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <configuration>
+                    <jvmTarget>${java.version}</jvmTarget>
+                    <args>
+                        <arg>-no-reflect</arg>
+                        <arg>-progressive</arg>
+                        <arg>-Xexplicit-api=strict</arg>
+                        <arg>-Xjdk-release=${java.version}</arg>
+                        <arg>-Xjsr305=strict</arg> <!-- Enable strict mode for JSR-305 annotations -->
+                        <arg>-Xstring-concat=indy-with-constants</arg>
+                        <arg>-Xjvm-default=all</arg>
+                    </args>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>generateEditorConfig</id>
+                        <phase>none</phase>
+                        <configuration>
+                            <target name="ktlint">
+                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
+                                      classpathref="maven.plugin.classpath" classname="com.pinterest.ktlint.Main">
+                                    <arg value="generateEditorConfig"/>
+                                    <!-- see https://pinterest.github.io/ktlint/install/cli/#command-line-usage for more information -->
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>ktlint</id>
+                        <phase>verify</phase>
+                        <configuration>
+                            <target name="ktlint">
+                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
+                                      classpathref="maven.plugin.classpath" classname="com.pinterest.ktlint.Main">
+                                    <arg value="src/**/*.kt"/>
+                                    <!-- see https://pinterest.github.io/ktlint/install/cli/#command-line-usage for more information -->
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>ktlint-format</id>
+                        <configuration>
+                            <target name="ktlint">
+                                <java taskname="ktlint" dir="${basedir}" fork="true" failonerror="true"
+                                      classpathref="maven.plugin.classpath" classname="com.pinterest.ktlint.Main">
+                                    <arg value="-F"/>
+                                    <arg value="src/**/*.kt"/>
+                                    <!-- see https://pinterest.github.io/ktlint/install/cli/#command-line-usage for more information -->
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.pinterest</groupId>
+                        <artifactId>ktlint</artifactId>
+                        <version>${ktlint.version}</version>
+                    </dependency>
+                    <!-- additional 3rd party ruleset(s) can be specified here -->
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+</project>
