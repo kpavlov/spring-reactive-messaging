@@ -3,12 +3,10 @@ package me.kpavlov.messaging.sqs.consumer
 import io.vavr.Tuple
 import io.vavr.Tuple2
 import me.kpavlov.messaging.MessageConsumerTemplate
-import me.kpavlov.messaging.ReactiveAcknowledgmentCallback
 import me.kpavlov.messaging.ReactiveMessageHandler
 import me.kpavlov.messaging.sqs.SqsConsumerOperations
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.integration.IntegrationMessageHeaderAccessor
 import org.springframework.integration.acks.AcknowledgmentCallback
 import org.springframework.messaging.Message
 import reactor.core.Disposable
@@ -43,7 +41,7 @@ public class SqsMessageConsumer<T> public constructor(
     private val subscriptionRef = AtomicReference<Disposable?>()
 
     init {
-        logger = LoggerFactory.getLogger(SqsMessageConsumer::class.java.toString() + "[" + queueName + "]")
+        logger = LoggerFactory.getLogger("${SqsMessageConsumer::class.java}[$queueName]")
         this.sqsClient = sqsClient
         this.messageProcessor = messageProcessor
         this.template = DefaultSqsConsumerOperations(sqsClient, properties, logger)
@@ -105,10 +103,7 @@ public class SqsMessageConsumer<T> public constructor(
             .flatMap { tuple: Tuple2<Message<T>, AcknowledgmentCallback.Status> ->
                 val message = tuple._1()
                 val result = tuple._2()
-                val callback = message.headers.get(
-                    IntegrationMessageHeaderAccessor.ACKNOWLEDGMENT_CALLBACK,
-                    ReactiveAcknowledgmentCallback::class.java
-                )
+                val callback = SqsMessageHeaders.getAcknowledgmentCallback(message)
                 if (callback != null && callback.isAutoAck && !callback.isAcknowledged) {
                     callback.acknowledgeAsync(result)
                 } else {

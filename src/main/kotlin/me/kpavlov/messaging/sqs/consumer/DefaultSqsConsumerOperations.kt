@@ -70,7 +70,7 @@ internal class DefaultSqsConsumerOperations(
         queueUrl: String,
         message: org.springframework.messaging.Message<T>
     ): Mono<Boolean> {
-        val receiptHandle = message.headers.get(SqsMessageHeaders.RECEIPT_HANDLE, String::class.java)
+        val receiptHandle = SqsMessageHeaders.getReceiptHandle(message)
         logger.info("Deleting message with receipt handle: {}", receiptHandle)
         val deleteMessageRequest = DeleteMessageRequest.builder().queueUrl(queueUrl)
             .receiptHandle(receiptHandle).build()
