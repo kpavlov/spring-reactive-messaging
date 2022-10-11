@@ -1,5 +1,7 @@
 # spring-reactive-messaging
 
+[![Build with Maven](https://github.com/kpavlov/spring-reactive-messaging/actions/workflows/build.yaml/badge.svg)](https://github.com/kpavlov/spring-reactive-messaging/actions/workflows/build.yaml)
+
 Reactive producer/consumer components
 inspired by [Spring Messaging](https://docs.spring.io/spring-boot/docs/current/reference/html/messaging.html)
 and [Spring Integration](https://spring.io/projects/spring-integration),
@@ -42,3 +44,8 @@ with a functionality similar to Spring Integration.
           on [AvailabilityChangeEvent](https://docs.spring.io/spring-boot/docs/current/api/org/springframework/boot/availability/AvailabilityChangeEvent.html)
 
     - [SqsPublisher](src/main/kotlin/me/kpavlov/messaging/sqs/publisher/SqsPublisher.kt)
+
+## Links
+
+- ["Processing SQS Messages using Spring Boot and Project Reactor"](http://www.java-allandsundry.com/2020/03/processing-sqs-messages-using-spring.html)
+- Even more simple SQS Listener: ["How to Setup a Reactive SQS Listener Using the AWS SDK and Spring Boot"](https://nickolasfisher.com/blog/How-to-Setup-a-Reactive-SQS-Listener-Using-the-AWS-SDK-and-Spring-Boot)
