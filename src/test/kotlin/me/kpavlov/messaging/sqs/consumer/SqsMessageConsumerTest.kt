@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.argThat
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -24,10 +25,10 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.function.Function
 
-private val logger = LoggerFactory.getLogger(MessageConsumerTest::class.java)
+private val logger = LoggerFactory.getLogger(SqsMessageConsumerTest::class.java)
 
 @ExtendWith(MockitoExtension::class)
-internal class MessageConsumerTest {
+internal class SqsMessageConsumerTest {
 
     @Mock
     lateinit var sqsClient: SqsAsyncClient
@@ -44,7 +45,7 @@ internal class MessageConsumerTest {
 
     private val queueUrl = "https://sqs.us-east-2.amazonaws.com/123456789012/$queueName"
 
-    lateinit var props: SqsConsumerProperties
+    private lateinit var props: SqsConsumerProperties
 
     lateinit var subject: SqsMessageConsumer<String>
 
@@ -143,9 +144,7 @@ internal class MessageConsumerTest {
     private fun `should delete messages`() {
         whenever(
             sqsClient.deleteMessage(
-                ArgumentMatchers.any(
-                    DeleteMessageRequest::class.java
-                )
+                ArgumentMatchers.any(DeleteMessageRequest::class.java)
             )
         )
             .thenAnswer {
@@ -159,7 +158,7 @@ internal class MessageConsumerTest {
     private fun `should get queueUrl`() {
         whenever(
             sqsClient.getQueueUrl(
-                ArgumentMatchers.argThat<GetQueueUrlRequest> {
+                argThat<GetQueueUrlRequest> {
                     it.queueName() == queueName
                 }
             )
@@ -183,7 +182,7 @@ internal class MessageConsumerTest {
 
         whenever(
             sqsClient.receiveMessage(
-                ArgumentMatchers.argThat<ReceiveMessageRequest> {
+                argThat<ReceiveMessageRequest> {
                     it.queueUrl() == queueUrl &&
                         it.maxNumberOfMessages() == props.batchSize &&
                         it.waitTimeSeconds() == props.waitTimeSeconds
